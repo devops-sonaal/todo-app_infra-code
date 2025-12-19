@@ -83,7 +83,7 @@ stages:
         continueOnError: true 
 
       - script: |
-          trufflehog filesystem .
+          trufflehog filesystem . --no-update
         displayName: "Run TruffleHog"
         workingDirectory: '$(Dev_folder)'
         continueOnError: true
