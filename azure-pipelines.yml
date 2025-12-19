@@ -53,6 +53,7 @@ stages:
           customCommand: 'fmt'
           environmentServiceNameAzureRM: 'service_connection_ado'
 
+# scan job
   - job: ScanJob
     displayName: scanning..
     dependsOn: precommit
@@ -62,6 +63,7 @@ stages:
     steps:
       - checkout: self
       - script: |
+          tflint --init
           tflint
         displayName: "Run TFLint"
         workingDirectory: $(Dev_folder)
@@ -75,13 +77,14 @@ stages:
           
 
       - script: |
-          checkov -d ./
+          checkov -d .
         displayName: "Run Checkov"
         workingDirectory: $(Dev_folder)
         continueOnError: true 
 
       - script: |
           trufflehog filesystem .
+          displayName: "Run TruffleHog"
         workingDirectory: '$(Dev_folder)'
         continueOnError: true
 
