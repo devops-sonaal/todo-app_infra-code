@@ -84,7 +84,7 @@ stages:
 
       - script: |
           trufflehog filesystem .
-          displayName: "Run TruffleHog"
+        displayName: "Run TruffleHog"
         workingDirectory: '$(Dev_folder)'
         continueOnError: true
 
