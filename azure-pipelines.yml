@@ -141,11 +141,11 @@ stages:
           command: 'plan'
           workingDirectory: '$(Dev_folder)'
           environmentServiceNameAzureRM: $(service_connection)
-          commandOptions: -out=tf_plan/tf_plan
+          commandOptions: -out=tf_plan
       - task: PublishPipelineArtifact@1
         inputs:
           # targetPath: '$(Pipeline.Workspace)'
-          targetPath: '$(Dev_folder)/tf_plan/tf_plan'
+          targetPath: '$(Dev_folder)/tf_plan'
           artifact: 'build_tf_plan'
           publishLocation: 'pipeline'
      
@@ -204,7 +204,7 @@ stages:
           command: 'apply'
           workingDirectory: '$(Dev_folder)'
           environmentServiceNameAzureRM: 'service_connection_ado'
-          commandOptions: '$(Dev_folder)/tf_plan/tf_plan'
+          commandOptions: '$(Dev_folder)/tf_plan'
             
 
 
