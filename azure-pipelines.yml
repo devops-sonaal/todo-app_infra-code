@@ -92,7 +92,8 @@ stages:
     displayName: infra_costing
     dependsOn: ScanJob 
     condition: succeeded()
-    pool: $(scanner_agent)
+    pool: 
+      name: $(scanner_agent)
 
     steps:
       - checkout: self    
@@ -102,8 +103,7 @@ stages:
         inputs:
          targetType: 'inline'
          script: |
-           Write-Host "API Key = $Env:INFRACOST_API_KEY"
-           infracost breakdown --path=$(WORKING_DIR)
+           infracost breakdown --path=$(Dev_folder)
          workingDirectory: '$(Dev_folder)'
         
 - stage: BuildPlan
