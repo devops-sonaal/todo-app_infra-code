@@ -103,7 +103,8 @@ stages:
         inputs:
          targetType: 'inline'
          script: |
-           infracost breakdown --path=$(Dev_folder)
+           Write-Host "API Key = $Env:api_key"
+           infracost breakdown --path=$(Dev_folder
          workingDirectory: '$(Dev_folder)'
         
 - stage: BuildPlan
