@@ -204,7 +204,7 @@ stages:
           command: 'apply'
           workingDirectory: '$(Dev_folder)'
           environmentServiceNameAzureRM: 'service_connection_ado'
-          commandOptions: '$(Dev_folder)/tf_plan -auto-approve'
+          commandOptions: '$(Dev_folder)/tf_plan'
             
 
 
