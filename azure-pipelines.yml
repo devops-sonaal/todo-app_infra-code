@@ -16,10 +16,10 @@ variables:
 
 
 stages:
-- stage: Pre-commit_stage
+- stage: PreCommitStage
   displayName: "Terraform Plan Stage"
   jobs:
-  - job: precommit-job
+  - job: precommit
     pool: $(ado_agent)
     steps:
       - task: TerraformInstaller@1
@@ -53,9 +53,9 @@ stages:
           customCommand: 'fmt'
           environmentServiceNameAzureRM: 'service_connection_ado'
 
-  - job: scan_job
+  - job: ScanJob
     displayName: scanning..
-    dependsOn: precommit-job 
+    dependsOn: precommit
     condition: succeeded()
     pool: $(scanner_agent)
 
@@ -87,7 +87,7 @@ stages:
 
   - job: costing
     displayName: infra_costing
-    dependsOn: scan_job 
+    dependsOn: ScanJob 
     condition: succeeded()
     pool: $(scanner_agent)
 
@@ -103,12 +103,13 @@ stages:
            infracost breakdown --path=$(WORKING_DIR)
          workingDirectory: '$(Dev_folder)'
         
-- stage: Build_plan
+- stage: BuildPlan
   displayName: build_plan_stage
-  condition: Pre-commit_stage 
+  dependsOn: PreCommitStage
+  condition: succeeded() 
   pool: $(ado_agent)
   jobs:
-    - job: Build_plan_job
+    - job: BuildPlanJob
       displayName: Build_plan_job
 
       steps:
@@ -144,10 +145,10 @@ stages:
      
           
 # Manual validation
-- stage: Manual_validation
+- stage: ManualValidation
   displayName: Manual_validation
   pool: server
-  dependsOn: Build_plan
+  dependsOn: BuildPlan
   condition: succeeded()
   jobs:
     - job: approval
@@ -161,12 +162,13 @@ stages:
 
 
 
-- stage: apply_stage
-  condition: Manual_validation 
+- stage: ApplyStage
+  dependsOn: ManualValidation
+  condition: succeeded()
   pool: $(ado_agent)
   jobs:
-    - job: Build_apply_job
-      displayName: Build_apply_job
+    - job: ApplyJob
+      displayName: apply_job
       steps:
       - task: TerraformInstaller@1
         inputs:
