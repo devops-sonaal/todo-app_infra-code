@@ -1,0 +1,215 @@
+# ================================
+# Dev Terraform Pipeline
+# ================================
+
+trigger:
+  branches:
+    include:
+      - main
+      - features/*
+
+variables:
+  Dev_folder: "$(System.DefaultWorkingDirectory)/Environment/Dev"          # Terraform code location
+  service_connection: "service_connection_ado"   # Azure Service Connection
+  ado_agent: "devsecops_ado_agent_pool" # Azure DevOps agent pool
+  scanner_agent: "devsecops_ado_ScannerPool" # scanning tool agent pool
+
+
+stages:
+- stage: PreCommitStage
+  displayName: "Terraform Plan Stage"
+  jobs:
+  - job: precommit
+    pool: $(ado_agent)
+    steps:
+      - task: TerraformInstaller@1
+        inputs:
+          terraformVersion: 'latest'
+ 
+      
+      - task: TerraformTask@5
+        inputs:
+          provider: 'azurerm'
+          command: 'init'
+          workingDirectory: $(Dev_folder)
+          backendServiceArm: $(service_connection)
+          backendAzureRmStorageAccountName: 'nehasg'
+          backendAzureRmContainerName: 'backendblob'
+          backendAzureRmKey: 'tfsate'
+
+      - task: TerraformTask@5
+        inputs:
+          provider: 'azurerm'
+          command: 'validate'
+          workingDirectory: '$(Dev_folder)'
+          environmentServiceNameAzureRM: $(service_connection)
+           
+      - task: TerraformTask@5
+        inputs:
+          provider: 'azurerm'
+          command: 'custom'
+          workingDirectory: '$(Dev_folder)'
+          outputTo: 'console'
+          customCommand: 'fmt'
+          environmentServiceNameAzureRM: 'service_connection_ado'
+
+# scan job
+  - job: ScanJob
+    displayName: scanning..
+    dependsOn: precommit
+    condition: succeeded()
+    pool: $(scanner_agent)
+
+    steps:
+      - checkout: self
+      - script: |
+          tflint --init
+          tflint
+        displayName: "Run TFLint"
+        workingDirectory: $(Dev_folder)
+        continueOnError: true
+  
+      - task: tfsec@1
+        displayName: "run tfsec"
+        inputs:
+          version: 'v1.26.0'
+          dir: '$(Dev_folder)'
+          
+
+      - script: |
+          checkov -d .
+        displayName: "Run Checkov"
+        workingDirectory: $(Dev_folder)
+        continueOnError: true 
+
+      - script: |
+          trufflehog filesystem . --no-update
+        displayName: "Run TruffleHog"
+        workingDirectory: '$(Dev_folder)'
+        continueOnError: true
+
+  - job: costing
+    displayName: infra_costing
+    dependsOn: ScanJob 
+    condition: succeeded()
+    pool: 
+      name: $(scanner_agent)
+
+    variables:
+    - group: infracost  
+
+    steps:
+      - checkout: self    
+      - task: Bash@3
+        displayName: Infracost analysis
+        continueOnError: true
+        inputs:
+         targetType: 'inline'
+         script: |
+           infracost breakdown --path=$(Dev_folder)
+         workingDirectory: '$(Dev_folder)'
+        
+- stage: BuildPlan
+  displayName: build_plan_stage
+  dependsOn: PreCommitStage
+  condition: succeeded() 
+  pool: $(ado_agent)
+  jobs:
+    - job: BuildPlanJob
+      displayName: Build_plan_job
+
+      steps:
+      - task: TerraformInstaller@1
+        inputs:
+          terraformVersion: 'latest'
+ 
+      
+      - task: TerraformTask@5
+        inputs:
+          provider: 'azurerm'
+          command: 'init'
+          workingDirectory: $(Dev_folder)
+          backendServiceArm: $(service_connection)
+          backendAzureRmStorageAccountName: 'nehasg'
+          backendAzureRmContainerName: 'backendblob'
+          backendAzureRmKey: 'tfsate'
+
+      - task: TerraformTask@5
+        displayName: terraform_plan
+        inputs:
+          provider: 'azurerm'
+          command: 'plan'
+          workingDirectory: '$(Dev_folder)'
+          environmentServiceNameAzureRM: $(service_connection)
+          commandOptions: -out=tf_plan
+      - task: PublishPipelineArtifact@1
+        inputs:
+          # targetPath: '$(Pipeline.Workspace)'
+          targetPath: '$(Dev_folder)/tf_plan'
+          artifact: 'build_tf_plan'
+          publishLocation: 'pipeline'
+     
+          
+# Manual validation
+- stage: ManualValidation
+  displayName: Manual_validation
+  pool: server
+  dependsOn: BuildPlan
+  condition: succeeded()
+  jobs:
+    - job: approval
+      displayName: validation required
+      steps:
+        - task: ManualValidation@1
+          displayName: approval
+          inputs:
+            notifyUsers: sonaal.kalra23@outlook.com
+            approvers: sonaal.kalra23@outlook.com
+
+
+
+- stage: ApplyStage
+  dependsOn: ManualValidation
+  condition: succeeded()
+  pool: $(ado_agent)
+  jobs:
+    - job: ApplyJob
+      displayName: apply_job
+      steps:
+      - task: TerraformInstaller@1
+        inputs:
+          terraformVersion: 'latest'
+ 
+      
+      - task: TerraformTask@5
+        inputs:
+          provider: 'azurerm'
+          command: 'init'
+          workingDirectory: $(Dev_folder)
+          backendServiceArm: $(service_connection)
+          backendAzureRmStorageAccountName: 'nehasg'
+          backendAzureRmContainerName: 'backendblob'
+          backendAzureRmKey: 'tfsate'
+
+      - task: DownloadPipelineArtifact@2
+        displayName: download_artifacts
+        inputs:
+          buildType: 'current'
+          artifactName: 'build_tf_plan'
+          targetPath: '$(Dev_folder)'
+
+      - task: TerraformTask@5
+        inputs:
+          provider: 'azurerm'
+          command: 'apply'
+          workingDirectory: '$(Dev_folder)'
+          environmentServiceNameAzureRM: 'service_connection_ado'
+          commandOptions: '$(Dev_folder)/tf_plan'
+            
+
+
+      
+        
+
+
+
