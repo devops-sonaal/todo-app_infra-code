@@ -121,6 +121,10 @@ variable "kv_role" {
   description = "The User Principal Name (UPN) of the admin user to be assigned roles."
 }
 
+variable "display_name" {
+  
+}
+
 
 variable "key_vault_fetch" {
   description = "Key Vault details to fetch"
