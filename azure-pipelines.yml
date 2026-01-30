@@ -51,7 +51,7 @@ stages:
           workingDirectory: '$(Dev_folder)'
           outputTo: 'console'
           customCommand: 'fmt'
-          environmentServiceNameAzureRM: 'service_connection_ado'
+          environmentServiceNameAzureRM: $(service_connection)
 
 # scan job
   - job: ScanJob
@@ -203,7 +203,7 @@ stages:
           provider: 'azurerm'
           command: 'apply'
           workingDirectory: '$(Dev_folder)'
-          environmentServiceNameAzureRM: 'service_connection_ado'
+          environmentServiceNameAzureRM: $(service_connection)
           commandOptions: '$(Dev_folder)/tf_plan'
             
 
