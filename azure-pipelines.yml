@@ -56,8 +56,8 @@ stages:
 # scan job
   - job: ScanJob
     displayName: scanning..
-    dependsOn: precommit
-    condition: succeeded()
+    #dependsOn: precommit
+    #condition: succeeded()
     pool: $(scanner_agent)
 
     steps:
@@ -86,7 +86,7 @@ stages:
           trufflehog filesystem . --no-update
         displayName: "Run TruffleHog"
         workingDirectory: '$(Dev_folder)'
-        continueOnError: true
+        #continueOnError: true
 
   - job: costing
     displayName: infra_costing
@@ -155,7 +155,12 @@ stages:
   displayName: Manual_validation
   pool: server
   dependsOn: BuildPlan
-  condition: succeeded()
+  condition: |
+    and(
+      succeeded(),
+      eq(variables['Build.SourceBranch'], 'refs/heads/main')
+    )
+
   jobs:
     - job: approval
       displayName: validation required
@@ -170,7 +175,12 @@ stages:
 
 - stage: ApplyStage
   dependsOn: ManualValidation
-  condition: succeeded()
+  condition: |
+    and(
+      succeeded(),
+      eq(variables['Build.SourceBranch'], 'refs/heads/main')
+    )
+
   pool: $(ado_agent)
   jobs:
     - job: ApplyJob
