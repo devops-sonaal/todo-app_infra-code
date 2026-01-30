@@ -122,7 +122,8 @@ variable "kv_role" {
 }
 
 variable "display_name" {
-  
+  type = string
+  description = "Display name for the service principal or user assigned to Key Vault roles."
 }
 
 
