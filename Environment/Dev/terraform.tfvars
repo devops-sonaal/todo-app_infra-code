@@ -89,7 +89,7 @@ key_vaults = {
   }
 }
 
-admin_upn = "sonaal.kalra@superusermandeepdevopsoutlo.onmicrosoft.com"
+#admin_upn = "sonaal.kalra@superusermandeepdevopsoutlo.onmicrosoft.com"
 kv_role   = "Key Vault Administrator"
 
 display_name = "serviceConnection"

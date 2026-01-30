@@ -18,12 +18,14 @@ variable "key_vaults" {
   }))
 }
 
-variable "admin_upn" {
-  type        = string
-  description = "The User Principal Name (UPN) of the admin user to be assigned roles." 
+# variable "admin_upn" {
+#   type        = string
+#   description = "The User Principal Name (UPN) of the admin user to be assigned roles." 
   
-}
+# }
 variable "display_name" {
+  type        = string
+  description = "The display name of the Azure AD application representing the service principal."
   
 }
 variable "kv_role" {

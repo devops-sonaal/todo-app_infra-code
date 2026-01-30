@@ -111,11 +111,11 @@ variable "key_vaults" {
     })
   }))
 }
-variable "admin_upn" {
-  type        = string
-  description = "The User Principal Name (UPN) of the admin user to be assigned roles."
+# variable "admin_upn" {
+#   type        = string
+#   description = "The User Principal Name (UPN) of the admin user to be assigned roles."
 
-}
+# }
 variable "kv_role" {
   type        = string
   description = "The User Principal Name (UPN) of the admin user to be assigned roles."

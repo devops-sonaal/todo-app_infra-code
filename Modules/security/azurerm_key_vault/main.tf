@@ -29,15 +29,16 @@ output "key_vault_ids" {
 
 
 
-data "azuread_user" "me" {
-  user_principal_name = var.admin_upn
-  }
+# data "azuread_user" "me" {
+#   user_principal_name = var.admin_upn
+#   }
 
 resource "azurerm_role_assignment" "kv_role_assign" {
   for_each             = azurerm_key_vault.org_key_vault   # loops per key vault
   scope                = each.value.id                      # key vault ID
   role_definition_name = var.kv_role                        # variable
-  principal_id         = data.azuread_user.me.object_id     # target user
+  principal_id = data.azuread_service_principal.sp.object_id
+
 }
 
 
