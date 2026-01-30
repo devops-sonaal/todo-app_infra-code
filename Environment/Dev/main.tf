@@ -64,7 +64,7 @@ module "Key_vault_dev" {
   key_vaults = var.key_vaults
   depends_on = [module.dev_rg]
   kv_role    = var.kv_role
-  admin_upn  = var.admin_upn
+  #admin_upn  = var.admin_upn
   display_name = var.display_name
 
 
