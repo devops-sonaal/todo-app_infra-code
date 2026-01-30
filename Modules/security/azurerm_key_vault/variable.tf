@@ -23,6 +23,9 @@ variable "admin_upn" {
   description = "The User Principal Name (UPN) of the admin user to be assigned roles." 
   
 }
+variable "display_name" {
+  
+}
 variable "kv_role" {
   type        = string
   description = "The User Principal Name (UPN) of the admin user to be assigned roles."
