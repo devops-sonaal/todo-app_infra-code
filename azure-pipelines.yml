@@ -10,7 +10,7 @@ trigger:
 
 variables:
   Dev_folder: "$(System.DefaultWorkingDirectory)/Environment/Dev"          # Terraform code location
-  service_connection: "service_connection_ado"   # Azure Service Connection
+  service_connection: "serviceConnection"   # Azure Service Connection
   ado_agent: "devsecops_ado_agent_pool" # Azure DevOps agent pool
   scanner_agent: "devsecops_ado_ScannerPool" # scanning tool agent pool
 
