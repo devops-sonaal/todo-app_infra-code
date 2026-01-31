@@ -121,10 +121,10 @@ variable "kv_role" {
   description = "The User Principal Name (UPN) of the admin user to be assigned roles."
 }
 
-variable "display_name" {
-  type = string
-  description = "Display name for the service principal or user assigned to Key Vault roles."
-}
+# variable "display_name" {
+#   type = string
+#   description = "Display name for the service principal or user assigned to Key Vault roles."
+# }
 
 
 variable "key_vault_fetch" {
