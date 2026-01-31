@@ -344,7 +344,7 @@ vm_nic = {
 
 stg = {
   devstgaccount01 = {
-    name                     = "devstgaccount001"
+    name                     = "devstgdhonduaccount001"
     resource_group_name      = "dev_rg01"
     location                 = "centralindia"
     account_tier             = "Standard"
