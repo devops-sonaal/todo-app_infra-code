@@ -23,14 +23,14 @@ variable "key_vaults" {
 #   description = "The User Principal Name (UPN) of the admin user to be assigned roles." 
   
 # }
-variable "display_name" {
-  type        = string
-  description = "The display name of the Azure AD application representing the service principal."
+# variable "display_name" {
+#   type        = string
+#   description = "The display name of the Azure AD application representing the service principal."
   
-}
+# }
 variable "kv_role" {
   type        = string
-  description = "The User Principal Name (UPN) of the admin user to be assigned roles."
+  description = "RBAC role for Key Vault"
 }
 
 
