@@ -37,7 +37,7 @@ resource "azurerm_role_assignment" "kv_role_assign" {
   for_each             = azurerm_key_vault.org_key_vault   # loops per key vault
   scope                = each.value.id                      # key vault ID
   role_definition_name = var.kv_role                        # variable
-  principal_id = data.azurerm_client_config.current.object_id
+  principal_id = data.azurerm_client_config.tenant.object_id  # Service Principal Object ID
 
 }
 
