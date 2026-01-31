@@ -2,7 +2,7 @@
 #   display_name = var.display_name
 # }
 
-data "azurerm_client_config" "current" {}
+data "azurerm_client_config" "tenant" {}
 
 # # Get Service Principal using Application ID
 # data "azuread_service_principal" "sp" {
