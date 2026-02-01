@@ -56,7 +56,10 @@ resource "azurerm_subnet_network_security_group_association" "assoc" {
   for_each                  = var.subnet_nsg_map
   subnet_id                 = module.dev_subnet.subnet_output_ids[each.value.subnet_key]
   network_security_group_id = module.dev_nsg.nsg_output_ids[each.value.nsg_key]
+
+  depends_on = [module.dev_subnet, module.dev_nsg]
 }
+
 
 
 module "Key_vault_dev" {
@@ -88,7 +91,7 @@ module "dev_vm" {
   subnet_ids       = module.dev_subnet.subnet_output_ids
   public_ip_ids    = module.dev_public_ip.public_ip_output_ids
   virtual_machines = var.virtual_machines
-  depends_on       = [module.dev_nsg, module.key_vaults_secret]
+  depends_on       = [module.dev_nsg, module.key_vaults_secret, azurerm_subnet_network_security_group_association.assoc, module.dev_rg]
   key_vault_fetch  = var.key_vault_fetch
   vm_map           = var.vm_map
   key_vaults_map   = module.Key_vault_dev.key_vault_ids
